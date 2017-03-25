@@ -102,6 +102,19 @@ The same number of index records is also required, each is 64 bits + 8 bits = 9 
 
 Adding 20% for overhead, I determined that around 1.2TB of disk space was required to generate a 2\^35 sieve. At the time when I did this project, disks weren't that large, so I set up several of my largest disks in a JBOD configuration to hold the temporary data. The single file on there, that was over 1TB at one point, is still the biggest file I've seen. It took around two weeks to run the app, during which time the disks were working continuously.
 
+## Implementations
+
+**gpu_full**: GPU version with all optimizations. PTX and CUDA C.
+
+**gpu_simple**: Simplest possible GPU implementation. PTX and CUDA C.
+
+**cpu_64bit_full**: CPU version with all optimizations. Assembly and C++.
+
+**cpu_64bit_ref**: Reference implementation that verifies the high level optimizations used in the GPU version in C++.
+
+**cpu_simple**: Simplest possible CPU implementation in C++.
+
+**mksieve_64bit**: Generate the sieve table for sieve optimization.
 
 ## Technologies
 
