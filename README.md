@@ -2,8 +2,7 @@
 
 See [Wikipedia - Collatz Conjecture](http://en.wikipedia.org/wiki/Collatz_conjecture) and [On the 3x + 1 problem](http://www.ericr.nl/wondrous/index.html) for more information about this intriguing mathematical problem.
 
-I think this might be the world's fastest single chip Collatz Delay
-Record calculator. With starting numbers in the 64 bit range, this app checks around 8 billion numbers per second for Delay Records on a GTX570 graphics card.
+I think this might be the world's fastest single chip Collatz [Delay Records](#delay-record) calculator. With starting numbers in the 64 bit range, this app checks around 8 billion numbers per second for Delay Records on a GTX570 graphics card.
 
 ## Glossary
 
@@ -13,21 +12,21 @@ A positive number for which the Delay is to be calculated. In theory, it can be 
 
 ### Delay
 
-:The number of iterations of the Collatz rules on a given N until the N reaches the value 1.
+The number of iterations of the Collatz rules on a given N until the N reaches the value 1.
 
 ### Trajectory
 
-:The path a specific N follows from its first value until it reaches the value 1.
+The path a specific N follows from its first value until it reaches the value 1.
 
 ### Delay Class
 
-: All numbers N that have a specific Delay.
+All numbers N that have a specific [Delay](#delay).
 
 ### Class Record
 
 The lowest [N](#n) in a given Delay Class.
 
-The first N that we find that has a previously unencountered [Delay](#delay) is a Class Record. If the Delay is also in the highest [Delay Class](#delay-class), it is also a [Delay Record](#class-record).
+The first N that we find that has a previously unencountered [Delay](#delay) is a Class Record. If the Delay is also in the highest [Delay Class](#delay-class), it is also a [Delay Record](#delay-record).
 
 ### Delay Record
 
