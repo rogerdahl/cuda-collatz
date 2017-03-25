@@ -112,3 +112,5 @@ CUDA, PTX, C++, Boost
 
 * There is one unused 32 bit word used for padding in the interleaved step table. It might be worth it to extend the exp3 to this word, so that more steps can be done in one iteration.
 
+* `step_size` is not needed in the inner loop since `tail_size` is guaranteed to be equal or higher than `step_size`.
+

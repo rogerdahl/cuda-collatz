@@ -77,27 +77,23 @@ const int sort_bufsize(1024 * 1024 * 1024);
 
 struct collatz_record
 {
-  collatz_record(u64 ap, u64 ar, u64 ai)
-    : p(ap), r(ar), i(ai)
+  collatz_record(u64 ap, u64 ar, u64 ai) : p(ap), r(ar), i(ai)
   {
   }
-  collatz_record()
-    : p(0), r(0), i(0)
+  collatz_record() : p(0), r(0), i(0)
   {
   }
 
   // p=6, r=56 and i=36 is enough for sieve_bits 2^35. We use some more bits
   // while keeping the full size at 16 bytes in the hopes of better performance.
   u64 r;
-  u64 i
-    : 56;
-  u64 p
-    : 8;
+  u64 i : 56;
+  u64 p : 8;
 };
 
 // Sort Collatz record by p, r, index.
 
-bool operator<(const collatz_record &a, const collatz_record &b)
+bool operator<(const collatz_record& a, const collatz_record& b)
 {
   if (a.p < b.p) {
     return true;
@@ -123,17 +119,17 @@ bool operator<(const collatz_record &a, const collatz_record &b)
   return false;
 }
 
-bool operator==(const collatz_record &a, const collatz_record &b)
+bool operator==(const collatz_record& a, const collatz_record& b)
 {
   return a.p == b.p && a.r == b.r && a.i == b.i;
 }
 
-bool operator!=(const collatz_record &a, const collatz_record &b)
+bool operator!=(const collatz_record& a, const collatz_record& b)
 {
   return !(a == b);
 }
 
-struct cmp: public std::less<collatz_record>
+struct cmp : public std::less<collatz_record>
 {
   collatz_record min_value() const
   {
@@ -141,9 +137,8 @@ struct cmp: public std::less<collatz_record>
   }
   collatz_record max_value() const
   {
-    return collatz_record(0xffffffffffffffff,
-                          0xffffffffffffffff,
-                          0xffffffffffffffff);
+    return collatz_record(
+        0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
   }
 };
 
@@ -151,12 +146,10 @@ struct cmp: public std::less<collatz_record>
 
 struct index_record
 {
-  index_record(u64 ai, bool ac)
-    : i(ai), c(ac)
+  index_record(u64 ai, bool ac) : i(ai), c(ac)
   {
   }
-  index_record()
-    : i(0), c(false)
+  index_record() : i(0), c(false)
   {
   }
   u64 i;
@@ -165,22 +158,22 @@ struct index_record
 
 // Sort index record by index.
 
-bool operator<(const index_record &a, const index_record &b)
+bool operator<(const index_record& a, const index_record& b)
 {
   return a.i < b.i;
 }
 
-bool operator==(const index_record &a, const index_record &b)
+bool operator==(const index_record& a, const index_record& b)
 {
   return a.i == b.i;
 }
 
-bool operator!=(const index_record &a, const index_record &b)
+bool operator!=(const index_record& a, const index_record& b)
 {
   return !(a == b);
 }
 
-struct cmp2: public std::less<index_record>
+struct cmp2 : public std::less<index_record>
 {
   index_record min_value() const
   {
@@ -200,15 +193,16 @@ bool generate_sieve(u64 sieve_bits)
     boost::timer time_display;
     boost::timer time_total;
 
-    stxxl::vector <collatz_record> collatz;
+    stxxl::vector<collatz_record> collatz;
     collatz.reserve(sieve_size);
 
     // Size
-    wcout
-      << wformat(L"Size of Collatz record: %d bytes") % sizeof(collatz_record)
-      << endl;
+    wcout << wformat(L"Size of Collatz record: %d bytes")
+                 % sizeof(collatz_record)
+          << endl;
     wcout << wformat(L"Size of Collatz vector: %d bytes")
-      % (sizeof(collatz_record) * sieve_size) << endl;
+                 % (sizeof(collatz_record) * sieve_size)
+          << endl;
 
     // Generate the sieve table.
 
@@ -218,9 +212,9 @@ bool generate_sieve(u64 sieve_bits)
       // Display status.
       if (time_display.elapsed() > 1.0f || i == sieve_size - 1) {
         time_display.restart();
-        wcout
-          << wformat(L"Generating Collatz records %d / %d (%.1fs)\r") % (i + 1)
-            % sieve_size % time_operation.elapsed() << flush;
+        wcout << wformat(L"Generating Collatz records %d / %d (%.1fs)\r")
+                     % (i + 1) % sieve_size % time_operation.elapsed()
+              << flush;
       }
       // Calculate p and r for this index.
       u64 p(0);
@@ -245,7 +239,7 @@ bool generate_sieve(u64 sieve_bits)
 
     // Generate index records from Collatz records.
 
-    stxxl::vector <index_record> indexes;
+    stxxl::vector<index_record> indexes;
     indexes.reserve(sieve_size);
     u64 last_p(-1);
     u64 last_r(-1);
@@ -256,9 +250,9 @@ bool generate_sieve(u64 sieve_bits)
          iter != collatz.end(); ++iter) {
       if (time_display.elapsed() > 1.0f || cnt_mark == sieve_size) {
         time_display.restart();
-        wcout
-          << wformat(L"Generating index records %d / %d (%.1fs)\r") % cnt_mark
-            % sieve_size % time_operation.elapsed() << flush;
+        wcout << wformat(L"Generating index records %d / %d (%.1fs)\r")
+                     % cnt_mark % sieve_size % time_operation.elapsed()
+              << flush;
       }
 
       bool c(true);
@@ -294,8 +288,8 @@ bool generate_sieve(u64 sieve_bits)
     // place, but that is NOT the same.
 
     time_operation.restart();
-    ofstream
-      out_bits(str(wformat(L"sieve_%d.dat") % sieve_bits).c_str(), ios::binary);
+    ofstream out_bits(
+        str(wformat(L"sieve_%d.dat") % sieve_bits).c_str(), ios::binary);
     u64 bits(0);
     u64 word(0);
     u64 cnt_create(0);
@@ -309,9 +303,9 @@ bool generate_sieve(u64 sieve_bits)
       // Status.
       if (time_display.elapsed() > 1.0f || cnt_create == sieve_size - 1) {
         time_display.restart();
-        wcout
-          << wformat(L"Creating sieve data file %d / %d (%.1fs)\r") % cnt_create
-            % sieve_size % time_operation.elapsed() << flush;
+        wcout << wformat(L"Creating sieve data file %d / %d (%.1fs)\r")
+                     % cnt_create % sieve_size % time_operation.elapsed()
+              << flush;
       }
       // Add bit to current word.
       if (iter->c) {
@@ -319,7 +313,7 @@ bool generate_sieve(u64 sieve_bits)
       }
       // Write word to disk if complete.
       if (++bits == sizeof(word) * 8) {
-        out_bits.write(reinterpret_cast<char *>(&word), sizeof(word));
+        out_bits.write(reinterpret_cast<char*>(&word), sizeof(word));
         bits = 0;
       }
       word >>= 1;
@@ -330,15 +324,13 @@ bool generate_sieve(u64 sieve_bits)
     // Warn if last word was not full.
     if (bits) {
       wcout << L"Warning: sieve_size not divisible by 64" << endl;
-      out_bits.write(reinterpret_cast<char *>(&word), sizeof(word));
+      out_bits.write(reinterpret_cast<char*>(&word), sizeof(word));
     }
     wcout << wformat(L"Total time %.1fs") % time_total.elapsed() << endl;
-  }
-  catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     wcout << L"Exception: " << ex.what() << endl;
     return false;
-  }
-  catch (...) {
+  } catch (...) {
     wcout << L"Unknown exception" << endl;
     return false;
   }
@@ -353,8 +345,8 @@ void generate_sieve_simple(u64 sieve_bits)
 {
   const u64 sieve_size(1LL << sieve_bits);
   // Generate the Collatz records.
-  scoped_array <u64> p(new u64[sieve_size]);
-  scoped_array <u64> r(new u64[sieve_size]);
+  scoped_array<u64> p(new u64[sieve_size]);
+  scoped_array<u64> r(new u64[sieve_size]);
   for (int i(0); i < sieve_size; ++i) {
     p[i] = 0;
     r[i] = i;
@@ -389,7 +381,8 @@ void generate_sieve_simple(u64 sieve_bits)
         ++pos;
       }
       wcout << wformat(L"2^%d - %.2f%%") % pos
-        % (double(disabled_calculations) / (double(i)) * 100) << endl;
+                   % (double(disabled_calculations) / (double(i)) * 100)
+            << endl;
     }
   }
 }
@@ -404,7 +397,7 @@ void display_bits(u64 sieve_bits)
   u64 i(0);
   while (!in.eof()) {
     u64 word;
-    in.read(reinterpret_cast<char *>(&word), sizeof(word));
+    in.read(reinterpret_cast<char*>(&word), sizeof(word));
     for (u64 j(0); j < sizeof(word) * 8; ++j) {
       wcout << i << L" " << (word & 1) << endl;
       word >>= 1;
@@ -424,7 +417,7 @@ double get_disabled_calculations(u64 sieve_bits)
   u64 i(0);
   while (!in.eof()) {
     u64 word;
-    in.read(reinterpret_cast<char *>(&word), sizeof(word));
+    in.read(reinterpret_cast<char*>(&word), sizeof(word));
     for (u64 j(0); j < sizeof(word) * 8; ++j) {
       if (!(word & 1)) {
         ++disabled_calculations;
@@ -468,7 +461,8 @@ void find_max(u64 sieve_bits)
     }
   }
   wcout << wformat(L"max for sieve_size %x: p: %x, r: %x") % sieve_size % p_max
-    % r_max << endl;
+               % r_max
+        << endl;
 }
 
 // Get Delay of N with only the most basic optimizations.
@@ -508,7 +502,7 @@ void gen_percentage_table(u64 sieve_bits)
   }
 }
 
-int wmain(int ac, wchar_t **av)
+int wmain(int ac, wchar_t** av)
 {
   // switch from C locale to user's locale
   std::locale::global(std::locale("")); // will be used for all new streams
@@ -525,10 +519,9 @@ int wmain(int ac, wchar_t **av)
   try {
     po::options_description desc("Options");
     po::variables_map vm;
-    desc.add_options()("help,h", "Produce help message")("size,s",
-                                                         po::value<int>(&sieve_bits)
-                                                           ->default_value(20),
-                                                         "Set the size of the sieve (2^X)");
+    desc.add_options()("help,h", "Produce help message")(
+        "size,s", po::value<int>(&sieve_bits)->default_value(20),
+        "Set the size of the sieve (2^X)");
 
     po::store(po::parse_command_line(ac, av, desc), vm);
     po::notify(vm);
@@ -537,8 +530,7 @@ int wmain(int ac, wchar_t **av)
       cout << desc << "\n";
       return 1;
     }
-  }
-  catch (exception &e) {
+  } catch (exception& e) {
     wcout << L"Error: Couldn't parse command line arguments: " << e.what()
           << endl;
     return 1;

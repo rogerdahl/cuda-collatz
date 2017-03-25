@@ -3,7 +3,7 @@ project(cuda_collatz)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/cuda_c)
+set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/gpu_ptx_full)
 set(UTIL ${CMAKE_SOURCE_DIR}/src/util)
 
 find_package(CUDA QUIET REQUIRED)
@@ -45,7 +45,7 @@ link_libraries(
 )
 
 cuda_add_executable(
-  cuda_collatz
+  collatz_ptx
   ${SOURCE_DIR}/collatz.cpp
   ${SOURCE_DIR}/collatz_kernel.cu
   ${UTIL}/cuda_util.cpp

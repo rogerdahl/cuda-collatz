@@ -63,7 +63,8 @@ unsigned int timer_cpu, timer_dma, timer_gpu;
 // ctrlbrk_ = true;
 //}
 
-template<typename T> void roll(T &v)
+template <typename T>
+void roll(T& v)
 {
   typename T::value_type b(v.back());
   v.pop_back();
@@ -113,7 +114,7 @@ void save_delay_record(u64 n, u32 delay, bool dbl)
 
 // Sorting result_records
 
-bool operator<(const result_record &a, const result_record &b)
+bool operator<(const result_record& a, const result_record& b)
 {
   if (a.n_sieve_ < b.n_sieve_) {
     return true;
@@ -121,17 +122,17 @@ bool operator<(const result_record &a, const result_record &b)
   return false;
 }
 
-bool operator==(const result_record &a, const result_record &b)
+bool operator==(const result_record& a, const result_record& b)
 {
   return a.n_sieve_ == b.n_sieve_;
 }
 
-bool operator!=(const result_record &a, const result_record &b)
+bool operator!=(const result_record& a, const result_record& b)
 {
   return !(a == b);
 }
 
-struct cmp: public std::less<result_record>
+struct cmp : public std::less<result_record>
 {
   result_record min_value() const
   {
@@ -160,11 +161,9 @@ u32 D(u64 n)
 }
 
 // CUDA Collatz Delay Record Calculator.
-void collatz(u32 step_bits,
-             u32 tail_bits,
-             vector<result_record *> &device_result_buf,
-             vector<result_record *> &host_result_buf,
-             vector<cudaStream_t> &streams)
+void collatz(
+    u32 step_bits, u32 tail_bits, vector<result_record*>& device_result_buf,
+    vector<result_record*>& host_result_buf, vector<cudaStream_t>& streams)
 {
   // Load sieve.
   u64 sieve_bytes(0);
@@ -183,7 +182,7 @@ void collatz(u32 step_bits,
   sieve_size = sieve_words * sizeof(u32) * 8;
   sieve_data.resize(sieve_words);
   sieve_file.seekg(0, ios::beg);
-  sieve_file.read(reinterpret_cast<char *>(&sieve_data[0]), sieve_bytes);
+  sieve_file.read(reinterpret_cast<char*>(&sieve_data[0]), sieve_bytes);
   sieve_file.close();
   cout << format("Sieve: %1% entries, %2% bytes") % sieve_size % sieve_bytes
        << endl;
@@ -224,12 +223,15 @@ void collatz(u32 step_bits,
       }
     }
     sieve_idx_v.push_back(sieve_idx);
-    cout << format("Sieve and 3k+2 filter %1%: %2% entries, %3% bytes, %4%%% "
-                     "sieved, %5% high value, 2^%6% high bit") % j
-      % static_cast<u32>(sieve_idx.size())
-      % (static_cast<u32>(sieve_idx.size()) * sizeof(u32)) % (100.0
-      - (static_cast<float>(sieve_idx.size()) / static_cast<float>(sieve_size)
-        * 100.0)) % sieve_high % high_bit(sieve_high) << endl;
+    cout << format(
+                "Sieve and 3k+2 filter %1%: %2% entries, %3% bytes, %4%%% "
+                "sieved, %5% high value, 2^%6% high bit")
+                % j % static_cast<u32>(sieve_idx.size())
+                % (static_cast<u32>(sieve_idx.size()) * sizeof(u32))
+                % (100.0 - (static_cast<float>(sieve_idx.size())
+                            / static_cast<float>(sieve_size) * 100.0))
+                % sieve_high % high_bit(sieve_high)
+         << endl;
   }
 
   // Calculate step tables.
@@ -264,16 +266,21 @@ void collatz(u32 step_bits,
     }
   }
   cout << format("c: %1% entries, %2% bytes, %3% high value, 2^%4% high bit")
-    % static_cast<u32>(c.size()) % (static_cast<u32>(c.size()) * sizeof(u32))
-    % c_high % high_bit(c_high) << endl;
+              % static_cast<u32>(c.size())
+              % (static_cast<u32>(c.size()) * sizeof(u32)) % c_high
+              % high_bit(c_high)
+       << endl;
   cout << format("d: %1% entries, %2% bytes, %3% high value, 2^%4% high bit")
-    % static_cast<u32>(d.size()) % (static_cast<u32>(d.size()) * sizeof(u32))
-    % d_high % high_bit(d_high) << endl;
+              % static_cast<u32>(d.size())
+              % (static_cast<u32>(d.size()) * sizeof(u32)) % d_high
+              % high_bit(d_high)
+       << endl;
 
   // Calculate 3 to the power of c for each value of c.
-  cout
-    << format("Calculating the exp3 table (3 to the power of c for each value "
-                "of c)") << endl;
+  cout << format(
+              "Calculating the exp3 table (3 to the power of c for each value "
+              "of c)")
+       << endl;
   vector<u32> exp3;
   u64 power_high(0);
   for (u64 i(0); i < c.size(); ++i) {
@@ -284,9 +291,10 @@ void collatz(u32 step_bits,
     }
   }
   cout << format("exp3: %1% entries, %2% bytes, %3% high value, 2^%4% high bit")
-    % static_cast<u32>(exp3.size())
-    % (static_cast<u32>(exp3.size()) * sizeof(u32)) % power_high
-    % high_bit(power_high) << endl;
+              % static_cast<u32>(exp3.size())
+              % (static_cast<u32>(exp3.size()) * sizeof(u32)) % power_high
+              % high_bit(power_high)
+       << endl;
 
   //// Load known Delay Records for the Early Break optimization.
   // cout << "Loading Delay Records" << endl;
@@ -324,11 +332,13 @@ void collatz(u32 step_bits,
       tail_high = delay;
     }
   }
-  cout
-    << format("Tail: %1% entries, %2% bits, %3% bytes, %4% high value, 2^%5% "
-                "high bit)") % static_cast<u32>(tail.size()) % tail_bits
-      % (static_cast<u32>(tail.size()) * sizeof(u32)) % tail_high
-      % high_bit(tail_high) << endl;
+  cout << format(
+              "Tail: %1% entries, %2% bits, %3% bytes, %4% high value, 2^%5% "
+              "high bit)")
+              % static_cast<u32>(tail.size()) % tail_bits
+              % (static_cast<u32>(tail.size()) * sizeof(u32)) % tail_high
+              % high_bit(tail_high)
+       << endl;
 
   // Find where to start calculating.
   u64 n_base(0);
@@ -341,7 +351,8 @@ void collatz(u32 step_bits,
     // We only have a small buffer for potential Delay Records, so we start the
     // calculation at a point where the buffer is unlikely to overflow.
     cout << "Warning: Couldn't open n_base.txt. Starting calculation from "
-      "scratch" << endl;
+            "scratch"
+         << endl;
     n_base = sieve_size << (1 + 5);
     delay_high = 1000;
   }
@@ -360,7 +371,8 @@ void collatz(u32 step_bits,
     n_base &= mask;
   }
   cout << format("Starting calculation at N Base: %1%, Delay: %2%") % n_base
-    % delay_high << endl;
+              % delay_high
+       << endl;
 
   // It is only safe to use the sieve on N higher than the sieve size.
   if (n_base < sieve_size << 1) {
@@ -376,7 +388,7 @@ void collatz(u32 step_bits,
   // Copy tables and constants to graphics card memory and initialize kernel.
   cout << "Initializing GPU kernel" << endl;
   vector<u32> sieve_sizes;
-  vector<u32 *> sieve_ptrs;
+  vector<u32*> sieve_ptrs;
   for (vector<vector<u32> >::iterator iter(sieve_idx_v.begin());
        iter != sieve_idx_v.end(); ++iter) {
     sieve_sizes.push_back(static_cast<u32>(iter->size()));
@@ -389,11 +401,12 @@ void collatz(u32 step_bits,
   //	delay_record_buf.push_back(static_cast<u32>(iter->n_));
   //	delay_record_buf.push_back(iter->delay_);
   //}
-  init_collatz(&sieve_ptrs[0], &sieve_sizes[0], // sieves
-               &c[0], &d[0], &exp3[0], step_bits, // step
-    //&delay_record_buf[0], static_cast<u32>(delay_record_buf.size()), //
-    // delay records
-               &tail[0], static_cast<u32>(tail.size())); // tail
+  init_collatz(
+      &sieve_ptrs[0], &sieve_sizes[0], // sieves
+      &c[0], &d[0], &exp3[0], step_bits, // step
+      //&delay_record_buf[0], static_cast<u32>(delay_record_buf.size()), //
+      // delay records
+      &tail[0], static_cast<u32>(tail.size())); // tail
 
   // We no longer need the host versions of the tables, so we free them.
   //  sieve
@@ -404,7 +417,7 @@ void collatz(u32 step_bits,
   vector<u32>().swap(exp3);
   vector<u32>().swap(tail);
   vector<u32>().swap(sieve_sizes);
-  vector<u32 *>().swap(sieve_ptrs);
+  vector<u32*>().swap(sieve_ptrs);
   //  delay record
   // vector<delay_record>().swap(delay_records);
   // vector<u32>().swap(delay_record_buf);
@@ -452,8 +465,9 @@ void collatz(u32 step_bits,
       save_n_base(n_base, delay_high);
       // Print benchmark.
       cout << format("N Base: %1%  Delay: %2%  Speed: %3% N/s") % n_base
-        % delay_high % static_cast<u64>(
-        static_cast<float>(n_base - n_base_start) / benchmark_timer.elapsed())
+                  % delay_high % static_cast<u64>(
+                                     static_cast<float>(n_base - n_base_start)
+                                     / benchmark_timer.elapsed())
            << endl;
 #ifdef GPU_TIMER
       cout << format("Avg GPU time: %.3fms")
@@ -492,12 +506,11 @@ void collatz(u32 step_bits,
     CUT_SAFE_CALL(cutStartTimer(timer_dma));
 #endif
 
-    checkCudaErrors(cudaMemcpyAsync(host_result_buf[1],
-                                    device_result_buf[1],
-                                    sizeof(result_record)
-                                      * result_record_buf_size,
-                                    cudaMemcpyDeviceToHost,
-                                    streams[1]));
+    checkCudaErrors(
+        cudaMemcpyAsync(
+            host_result_buf[1], device_result_buf[1],
+            sizeof(result_record) * result_record_buf_size,
+            cudaMemcpyDeviceToHost, streams[1]));
 
 #ifdef GPU_TIMER
     checkCudaErrors(cudaThreadSynchronize());
@@ -520,7 +533,7 @@ void collatz(u32 step_bits,
     // Copy any returned records to a vector.
     vector<result_record> result_records;
     for (u32 result_idx(0); result_idx < result_record_buf_size; ++result_idx) {
-      result_record &dl(host_result_buf[0][result_idx]);
+      result_record& dl(host_result_buf[0][result_idx]);
       if (dl.n_sieve_ == 0xffffffff) {
         break;
       }
@@ -578,7 +591,7 @@ void collatz(u32 step_bits,
   clean_collatz();
 }
 
-int main(int ac, char **av)
+int main(int ac, char** av)
 {
   // Set current directory to where exe is and store it (current directory is a
   // global variable that should never be changed)
@@ -606,11 +619,13 @@ int main(int ac, char **av)
   cout << "128 bit CUDA/PTX Collatz Delay Record Calculator (C)2008 Roger Dahl"
        << endl;
   cout << "Thanks to Eric Roosendaal for describing the high-level "
-    "optimizations\n" << endl;
+          "optimizations\n"
+       << endl;
 
   // Find number of CUDA devices.
   u32 cuda_device_count;
-  checkCudaErrorsNoSync(cudaGetDeviceCount(reinterpret_cast<int *>(&cuda_device_count)));
+  checkCudaErrorsNoSync(
+      cudaGetDeviceCount(reinterpret_cast<int*>(&cuda_device_count)));
   if (!cuda_device_count) {
     cout << "Error: Found no devices supporting CUDA" << endl;
     return 1;
@@ -632,15 +647,13 @@ int main(int ac, char **av)
   // Handle program options.
   po::options_description desc("Options");
   po::variables_map vm;
-  desc.add_options()("help,h", "Produce help message")("step_bits,b",
-                                                       po::value<u32>(&step_bits)
-                                                         ->default_value(19),
-                                                       "Width of step table (number of steps per iteration)")(
-    "tail_bits,t",
-    po::value<u32>(&tail_bits)->default_value(19),
-    "Width of tail table")("device,d",
-                           po::value<u32>(&cuda_device)->default_value(0),
-                           "CUDA device");
+  desc.add_options()("help,h", "Produce help message")(
+      "step_bits,b", po::value<u32>(&step_bits)->default_value(19),
+      "Width of step table (number of steps per iteration)")(
+      "tail_bits,t", po::value<u32>(&tail_bits)->default_value(19),
+      "Width of tail table")(
+      "device,d", po::value<u32>(&cuda_device)->default_value(0),
+      "CUDA device");
   try {
     po::store(po::parse_command_line(ac, av, desc), vm);
     po::notify(vm);
@@ -649,8 +662,7 @@ int main(int ac, char **av)
       cout << desc << endl;
       return 0;
     }
-  }
-  catch (std::exception &e) {
+  } catch (std::exception& e) {
     cout << "Error: Couldn't parse command line arguments: " << e.what() << "\n"
          << endl;
     cout << desc << endl;
@@ -706,7 +718,8 @@ int main(int ac, char **av)
 
   if (step_bits > 19) {
     cout << "Error: step_bits must be 19 or less because higher numbers cause "
-      "32 bit overflow" << endl;
+            "32 bit overflow"
+         << endl;
     return 1;
   }
 
@@ -724,25 +737,29 @@ int main(int ac, char **av)
   // signal(SIGBREAK, ctrlbrk_handler);
 
   // Create 2 device result and host result buffers.
-  vector<result_record *> device_result_buf(2);
-  vector<result_record *> host_result_buf(2);
+  vector<result_record*> device_result_buf(2);
+  vector<result_record*> host_result_buf(2);
   for (int i(0); i < 2; ++i) {
     // Device result buffers.
-    checkCudaErrors(cudaMalloc((void **) &device_result_buf[i],
-                               sizeof(result_record) * result_record_buf_size));
+    checkCudaErrors(
+        cudaMalloc(
+            (void**)&device_result_buf[i],
+            sizeof(result_record) * result_record_buf_size));
     // We use 0xffffffff as a flag that a value has not been inserted into the
     // table.
-    checkCudaErrors(cudaMemset((void *) device_result_buf[i],
-                               0xffffffff,
-                               sizeof(result_record) * result_record_buf_size));
+    checkCudaErrors(
+        cudaMemset(
+            (void*)device_result_buf[i], 0xffffffff,
+            sizeof(result_record) * result_record_buf_size));
 
     // Host result buffers.
-    checkCudaErrors(cudaMallocHost((void **) &host_result_buf[i],
-                                   sizeof(result_record)
-                                     * result_record_buf_size));
-    memset(host_result_buf[i],
-           0xffffffff,
-           sizeof(result_record) * result_record_buf_size);
+    checkCudaErrors(
+        cudaMallocHost(
+            (void**)&host_result_buf[i],
+            sizeof(result_record) * result_record_buf_size));
+    memset(
+        host_result_buf[i], 0xffffffff,
+        sizeof(result_record) * result_record_buf_size);
   }
 
   // Create 2 streams.
@@ -754,20 +771,19 @@ int main(int ac, char **av)
   // Run the calculation.
   try {
     collatz(step_bits, tail_bits, device_result_buf, host_result_buf, streams);
-  }
-  catch (...) {
+  } catch (...) {
     cout << "Error: Unhandled exception" << endl;
     // Error exit.
     return 1;
   }
 
   // Free buffers.
-  for (vector<result_record *>::iterator iter(device_result_buf.begin());
+  for (vector<result_record*>::iterator iter(device_result_buf.begin());
        iter != device_result_buf.end(); ++iter) {
     checkCudaErrors(cudaFree(*iter));
   }
 
-  for (vector<result_record *>::iterator iter(host_result_buf.begin());
+  for (vector<result_record*>::iterator iter(host_result_buf.begin());
        iter != host_result_buf.end(); ++iter) {
     checkCudaErrors(cudaFreeHost(*iter));
   }

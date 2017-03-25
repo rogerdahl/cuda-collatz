@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <cstdlib>
+#include <stdio.h>
 
 #include "collatz_kernel.h"
 #include "cuda_util.h"
@@ -18,9 +18,9 @@ const u32 threads_per_block(512);
 texture<uint4, 1, cudaReadModeElementType> tex_step;
 
 // Linear memory
-u32 *device_sieve_linear[3];
-u32 *device_step_linear(0);
-u32 *device_tail_linear(0);
+u32* device_sieve_linear[3];
+u32* device_step_linear(0);
+u32* device_tail_linear(0);
 
 // Hold copies of these so that they don't have to be passed to run().
 u32 sieve_size[3];
@@ -50,12 +50,13 @@ int div_up(int a, int b)
 // This is a place holder for the collatz kernel, required by CUDA. The actual
 // kernel is implemented in PTX and is loaded, compiled and called instead of
 // this one at runtime.
-__global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
-                               u32 delay_high, // high delay
-                               u32 *sieve_buf, // sieve
-                               u32 step_bits, // step
-                               u32 *tail_buf, u32 tail_size, // tail
-                               result_record *result_buf) // result
+__global__ void collatz_kernel(
+    u32 n_base_1, u32 n_base_0, // base
+    u32 delay_high, // high delay
+    u32* sieve_buf, // sieve
+    u32 step_bits, // step
+    u32* tail_buf, u32 tail_size, // tail
+    result_record* result_buf) // result
 {
   // uint4 q = tex1Dfetch(tex_step, 14);
   // 128 bit CUDA/PTX Collatz Delay Record Calculator (C)2008 Roger Dahl
@@ -107,8 +108,8 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
   // Set up the starting N.
   // u128 n(n_base(128) + tex1Dfetch(tex_sieve, n_idx))(32);
   asm("	.reg .u32 n_<4>;");
-  asm("	mov.u32 n_0, %0;"::"r"(n_base_0)); // line 43, 65
-  asm("	mov.u32 n_1, %0;"::"r"(n_base_1));
+  asm("	mov.u32 n_0, %0;" ::"r"(n_base_0)); // line 43, 65
+  asm("	mov.u32 n_1, %0;" ::"r"(n_base_1));
   asm("	mov.u32 n_2, 0;");
   asm("	mov.u32 n_3, 0;");
 
@@ -129,7 +130,7 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
   asm("	.reg .u64 tmp_u64;");
   asm(" cvt.u64.u32 tmp_u64, n_idx;");
   asm("	shl.b64 sieve_buf, tmp_u64, 2;");
-  asm("	add.u64 sieve_buf, sieve_buf, %0;"::"l"(sieve_buf));
+  asm("	add.u64 sieve_buf, sieve_buf, %0;" ::"l"(sieve_buf));
   asm("	.reg .u32 sieve_val;");
   asm("	ld.global.u32 sieve_val, [sieve_buf];");
 
@@ -153,7 +154,7 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
   asm("	.reg .u32 step_bits;");
   asm("	.reg .u32 step_bits_compl;");
   // asm("	ld.param.u32 step_bits, [_step_bits];");
-  asm("	mov.u32 step_bits, %0;"::"r"(step_bits));
+  asm("	mov.u32 step_bits, %0;" ::"r"(step_bits));
   asm("	sub.u32 step_bits_compl, 32, step_bits;");
 
   asm("	.reg .u32 step_size;");
@@ -163,10 +164,10 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
   asm("	sub.u32 step_mask, step_size, 1;");
 
   asm("	.reg .u32 tail_size;");
-  asm("	mov.u32 tail_size, %0;"::"r"(tail_size));
+  asm("	mov.u32 tail_size, %0;" ::"r"(tail_size));
 
   asm("	.reg .u64 result_buf;");
-  asm("	mov.u64 result_buf, %0;"::"l"(result_buf));
+  asm("	mov.u64 result_buf, %0;" ::"l"(result_buf));
 
   // We optimize the loop so that it checks only at the end. This would
   // invalidate results if we started calculating at n_tmp < step_size but we
@@ -239,13 +240,13 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
   asm("	.reg .u64 tail_buf;");
   asm(" cvt.u64.u32 tmp_u64, n_tmp_0;");
   asm("	shl.b64 tail_buf, tmp_u64, 2;");
-  asm("	add.u64 tail_buf, tail_buf, %0;"::"l"(tail_buf));
+  asm("	add.u64 tail_buf, tail_buf, %0;" ::"l"(tail_buf));
   asm("	ld.global.u32 u32_0, [tail_buf];");
   asm("	add.u32 delay, delay, u32_0;");
 
   // if (delay > delay_high) {
   // asm("	ld.param.u32 u32_0, [_delay_high];");
-  asm("	setp.le.u32 p, delay, %0;"::"r"(delay_high));
+  asm("	setp.le.u32 p, delay, %0;" ::"r"(delay_high));
   asm("	@p exit;");
 
   // Each Collatz Record is 8 bytes long. Calculate offset.
@@ -260,15 +261,11 @@ __global__ void collatz_kernel(u32 n_base_1, u32 n_base_0, // base
 }
 
 // Prepare data for run().
-void init_collatz(u32 **_host_sieve,
-                  u32 *_sieve_size,
-                  u32 *_c,
-                  u32 *_d,
-                  u32 *_exp3,
-                  u32 _step_bits,
-  // u32* _delay_record_buf, u32 _delay_record_buf_size,
-                  u32 *_host_tail,
-                  u32 _tail_size)
+void init_collatz(
+    u32** _host_sieve, u32* _sieve_size, u32* _c, u32* _d, u32* _exp3,
+    u32 _step_bits,
+    // u32* _delay_record_buf, u32 _delay_record_buf_size,
+    u32* _host_tail, u32 _tail_size)
 {
   // Store various.
   sieve_size[0] = _sieve_size[0];
@@ -278,8 +275,8 @@ void init_collatz(u32 **_host_sieve,
   tail_size = _tail_size;
 
   // Channel descriptions.
-  cudaChannelFormatDesc
-    ch_uint4 = cudaCreateChannelDesc<uint4>(); // uint3 is not supported.
+  cudaChannelFormatDesc ch_uint4 =
+      cudaCreateChannelDesc<uint4>(); // uint3 is not supported.
   cudaChannelFormatDesc ch_u32 = cudaCreateChannelDesc<u32>();
 
   u32 head_bytes(sizeof(u32) * threads_per_block);
@@ -290,31 +287,31 @@ void init_collatz(u32 **_host_sieve,
   // indexes.
   for (int i(0); i < 3; ++i) {
     u32 sieve_bytes(sizeof(u32) * _sieve_size[i]);
-    checkCudaErrors(cudaMalloc((void **) &device_sieve_linear[i],
-                               sieve_bytes + head_bytes));
-    checkCudaErrors(cudaMemset((void *) device_sieve_linear[i],
-                               0,
-                               sieve_bytes + head_bytes));
-    checkCudaErrors(cudaMemcpy(device_sieve_linear[i],
-                               _host_sieve[i],
-                               sieve_bytes,
-                               cudaMemcpyHostToDevice));
+    checkCudaErrors(
+        cudaMalloc((void**)&device_sieve_linear[i], sieve_bytes + head_bytes));
+    checkCudaErrors(
+        cudaMemset((void*)device_sieve_linear[i], 0, sieve_bytes + head_bytes));
+    checkCudaErrors(
+        cudaMemcpy(
+            device_sieve_linear[i], _host_sieve[i], sieve_bytes,
+            cudaMemcpyHostToDevice));
   }
 
   // We stuff the c, d and exp3 tables into a single texture so that the values
   // can be looked up with a single tex lookup. We use linear memory. We use a
   // four integer vector. The fourth integer is unused padding.
   u32 step_size(1LL << _step_bits);
-  checkCudaErrors(cudaMalloc((void **) &device_step_linear,
-                             sizeof(uint4) * step_size + head_bytes));
-  uint4 *t = new uint4[step_size];
+  checkCudaErrors(
+      cudaMalloc(
+          (void**)&device_step_linear, sizeof(uint4) * step_size + head_bytes));
+  uint4* t = new uint4[step_size];
   for (u32 i(0); i < step_size; ++i) {
     t[i] = make_uint4(_exp3[i], _c[i], _d[i], 0);
   }
-  checkCudaErrors(cudaMemcpy(device_step_linear,
-                             t,
-                             sizeof(uint4) * step_size,
-                             cudaMemcpyHostToDevice));
+  checkCudaErrors(
+      cudaMemcpy(
+          device_step_linear, t, sizeof(uint4) * step_size,
+          cudaMemcpyHostToDevice));
 
   //// Set texture parameters
   // tex_step.addressMode[0] = cudaAddressModeClamp;
@@ -334,32 +331,32 @@ void init_collatz(u32 **_host_sieve,
   //	(void*)_delay_record_buf, sizeof(u32) * _delay_record_buf_size));
 
   // Create an uncached global, linear memory array containing the tail.
-  checkCudaErrors(cudaMalloc((void **) &device_tail_linear,
-                             sizeof(u32) * _tail_size));
-  checkCudaErrors(cudaMemcpy(device_tail_linear,
-                             _host_tail,
-                             sizeof(u32) * _tail_size,
-                             cudaMemcpyHostToDevice));
+  checkCudaErrors(
+      cudaMalloc((void**)&device_tail_linear, sizeof(u32) * _tail_size));
+  checkCudaErrors(
+      cudaMemcpy(
+          device_tail_linear, _host_tail, sizeof(u32) * _tail_size,
+          cudaMemcpyHostToDevice));
 }
 
 // Async. Start GPU collatz calculator threads to process one buf of N.
-void run_collatz(u64 n_base,
-                 u32 delay_high,
-                 result_record *device_result_buf,
-                 cudaStream_t stream)
+void run_collatz(
+    u64 n_base, u32 delay_high, result_record* device_result_buf,
+    cudaStream_t stream)
 {
   // set up the global result index counter
   // result_idx = 0;
   // checkCudaErrors(cudaMemcpyToSymbol(result_idx, (void*)&result_idx,
   // sizeof(result_idx)));
-  u32 *result_idx_ptr;
-  checkCudaErrors(cudaGetSymbolAddress((void **) &result_idx_ptr, result_idx));
+  u32* result_idx_ptr;
+  checkCudaErrors(cudaGetSymbolAddress((void**)&result_idx_ptr, result_idx));
   checkCudaErrors(cudaMemset(result_idx_ptr, 0, sizeof(result_idx)));
 
   // Clear out the device result record.
-  checkCudaErrors(cudaMemset((void *) device_result_buf,
-                             0xffffffff,
-                             sizeof(result_record) * result_record_buf_size));
+  checkCudaErrors(
+      cudaMemset(
+          (void*)device_result_buf, 0xffffffff,
+          sizeof(result_record) * result_record_buf_size));
 
   // DEBUG: Clear out the debug area.
   // checkCudaErrors(cudaMemset((void*)(device_result_buf + 50), 0,
@@ -381,8 +378,8 @@ void run_collatz(u64 n_base,
   dim3 Db(threads_per_block, 1);
   //	dim3 Db(1, 1);
 
-  collatz_kernel <<< Dg, Db, 0, stream >>> (
-    static_cast<u32>(n_base >> 32), static_cast<u32>(n_base), // base
+  collatz_kernel<<<Dg, Db, 0, stream>>>(
+      static_cast<u32>(n_base >> 32), static_cast<u32>(n_base), // base
       delay_high, // high delay
       device_sieve_linear[sieve_mod], // sieve
       step_bits, // step
