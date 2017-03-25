@@ -33,7 +33,7 @@ Delay Class
 
 Class Record
 
-The lowest [N](n) in a given Delay Class.
+The lowest [N](#n) in a given Delay Class.
 
 The first N that we find that has a previously unencountered
 
