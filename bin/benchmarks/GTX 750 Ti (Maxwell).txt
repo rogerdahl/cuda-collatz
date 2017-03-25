@@ -1,0 +1,42 @@
+128 bit CUDA/PTX Collatz Delay Record Calculator (C)2008 Roger Dahl
+Thanks to Eric Roosendaal for describing the high-level optimizations
+
+Using device 0:
+
+Name: GeForce GTX 750 Ti
+Compute Capability: 5.0
+MultiProcessor Count: 5
+Clock Rate: 1,150,000 Hz
+Warp Size: 32
+Total Constant Memory: 65,536 bytes
+Total Global Memory: 2,147,483,648 bytes
+Shared Memory Per Block: 49,152 bytes
+Max Grid Size: (2,147,483,647, 65,535, 65,535)
+Max Threads Dim: (1,024, 1,024, 64)
+Max Threads Per Block: 1,024
+Regs Per Block: 65,536
+Memory Pitch: 2,147,483,647
+Texture Alignment: 512
+Device Overlap: 1
+
+Loading sieve
+Sieve: 33,554,432 entries, 4,194,304 bytes
+Calculating sieve index
+Sieve and 3k+2 filter 0: 4,273,282 entries, 17,093,128 bytes, 87.2646% sieved, 67,108,863 high value, 2^26 high bit
+Sieve and 3k+2 filter 1: 4,273,226 entries, 17,092,904 bytes, 87.2648% sieved, 67,108,863 high value, 2^26 high bit
+Sieve and 3k+2 filter 2: 4,272,930 entries, 17,091,720 bytes, 87.2657% sieved, 67,108,859 high value, 2^26 high bit
+Steps per iteration: 19
+Calculating the c and d tables
+c: 524,288 entries, 2,097,152 bytes, 19 high value, 2^5 high bit
+d: 524,288 entries, 2,097,152 bytes, 1,162,261,466 high value, 2^31 high bit
+Calculating the exp3 table (3 to the power of c for each value of c)
+exp3: 524,288 entries, 2,097,152 bytes, 1,162,261,467 high value, 2^31 high bit
+Calculating tail
+Tail: 524,288 entries, 19 bits, 2,097,152 bytes, 469 high value, 2^9 high bit)
+Loading N Base
+Starting calculation at N Base: 12,975,968,616,448, Delay: 1,566
+Initializing GPU kernel
+Starting calculation
+
+N Base: 13,355,469,242,368  Delay: 1,566  Speed: 6,323,956,439 N/s
+N Base: 13,734,835,650,560  Delay: 1,566  Speed: 6,321,784,689 N/s

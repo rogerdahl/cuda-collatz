@@ -1,0 +1,106 @@
+128 bit CUDA/PTX Collatz Delay Record Calculator (C)2008 Roger Dahl
+Thanks to Eric Roosendaal for describing the high-level optimizations
+
+Using device 0:
+
+Name: GeForce GTX 780 Ti
+Compute Capability: 3.5
+MultiProcessor Count: 15
+Clock Rate: 928,000 Hz
+Warp Size: 32
+Total Constant Memory: 65,536 bytes
+Total Global Memory: 3,165,782,016 bytes
+Shared Memory Per Block: 49,152 bytes
+Max Grid Size: (2,147,483,647, 65,535, 65,535)
+Max Threads Dim: (1,024, 1,024, 64)
+Max Threads Per Block: 1,024
+Regs Per Block: 65,536
+Memory Pitch: 2,147,483,647
+Texture Alignment: 512
+Device Overlap: 1
+
+Loading sieve
+Sieve: 33,554,432 entries, 4,194,304 bytes
+Calculating sieve index
+Sieve and 3k+2 filter 0: 4,273,282 entries, 17,093,128 bytes, 87.2646% sieved, 67,108,863 high value, 2^26 high bit
+Sieve and 3k+2 filter 1: 4,273,226 entries, 17,092,904 bytes, 87.2648% sieved, 67,108,863 high value, 2^26 high bit
+Sieve and 3k+2 filter 2: 4,272,930 entries, 17,091,720 bytes, 87.2657% sieved, 67,108,859 high value, 2^26 high bit
+Steps per iteration: 19
+Calculating the c and d tables
+c: 524,288 entries, 2,097,152 bytes, 19 high value, 2^5 high bit
+d: 524,288 entries, 2,097,152 bytes, 1,162,261,466 high value, 2^31 high bit
+Calculating the exp3 table (3 to the power of c for each value of c)
+exp3: 524,288 entries, 2,097,152 bytes, 1,162,261,467 high value, 2^31 high bit
+Calculating tail
+Tail: 524,288 entries, 19 bits, 2,097,152 bytes, 469 high value, 2^9 high bit)
+Loading N Base
+Starting calculation at N Base: 3,674,478,739,456, Delay: 1,440
+Initializing GPU kernel
+Starting calculation
+
+N: 3,700,892,032,993    Delay: 1,443
+N: 3,743,559,068,799    Delay: 1,549
+N Base: 4,566,825,304,064  Delay: 1,549  Speed: 14,872,053,343 N/s
+N Base: 5,407,363,825,664  Delay: 1,549  Speed: 14,440,117,127 N/s
+N Base: 6,180,592,156,672  Delay: 1,549  Speed: 13,922,284,443 N/s
+N Base: 6,951,270,350,848  Delay: 1,549  Speed: 13,652,803,296 N/s
+N Base: 7,721,814,327,296  Delay: 1,549  Speed: 13,490,630,670 N/s
+N: 7,487,118,137,598    Delay: 1,550 (double)
+N: 7,887,663,552,367    Delay: 1,563
+N Base: 8,492,358,303,744  Delay: 1,563  Speed: 13,382,496,499 N/s
+N Base: 9,262,969,389,056  Delay: 1,563  Speed: 13,305,333,722 N/s
+N Base: 10,033,446,256,640  Delay: 1,563  Speed: 13,247,287,695 N/s
+N: 10,516,884,736,489   Delay: 1,566
+N Base: 10,803,923,124,224  Delay: 1,566  Speed: 13,202,115,725 N/s
+N Base: 11,574,467,100,672  Delay: 1,566  Speed: 13,166,104,232 N/s
+N Base: 12,345,011,077,120  Delay: 1,566  Speed: 13,136,583,480 N/s
+N Base: 13,115,555,053,568  Delay: 1,566  Speed: 13,111,985,303 N/s
+N Base: 13,886,031,921,152  Delay: 1,566  Speed: 13,091,128,141 N/s
+N: 14,022,512,981,985   Delay: 1,569
+N Base: 14,656,575,897,600  Delay: 1,569  Speed: 13,073,286,667 N/s
+N Base: 15,427,119,874,048  Delay: 1,569  Speed: 13,057,824,229 N/s
+N Base: 16,197,596,741,632  Delay: 1,569  Speed: 13,044,251,788 N/s
+N Base: 16,968,006,500,352  Delay: 1,569  Speed: 13,032,234,329 N/s
+N Base: 17,738,282,041,344  Delay: 1,569  Speed: 13,021,397,645 N/s
+N Base: 18,508,289,146,880  Delay: 1,569  Speed: 13,011,448,799 N/s
+N Base: 19,278,094,925,824  Delay: 1,569  Speed: 13,002,347,237 N/s
+N: 19,536,224,150,271   Delay: 1,585
+N Base: 20,047,565,160,448  Delay: 1,585  Speed: 12,993,872,620 N/s
+N Base: 20,816,968,286,208  Delay: 1,585  Speed: 12,986,109,263 N/s
+N Base: 21,586,304,303,104  Delay: 1,585  Speed: 12,978,970,626 N/s
+N Base: 22,355,707,428,864  Delay: 1,585  Speed: 12,972,457,656 N/s
+N Base: 23,125,110,554,624  Delay: 1,585  Speed: 12,966,454,119 N/s
+N Base: 23,894,513,680,384  Delay: 1,585  Speed: 12,960,916,760 N/s
+N Base: 24,663,916,806,144  Delay: 1,585  Speed: 12,955,783,025 N/s
+N Base: 25,433,319,931,904  Delay: 1,585  Speed: 12,951,040,558 N/s
+N Base: 26,202,790,166,528  Delay: 1,585  Speed: 12,946,640,258 N/s
+N: 26,262,557,464,201   Delay: 1,588
+N Base: 26,972,193,292,288  Delay: 1,588  Speed: 12,942,529,810 N/s
+N: 27,667,550,250,351   Delay: 1,601
+N Base: 27,741,529,309,184  Delay: 1,601  Speed: 12,938,642,523 N/s
+N Base: 28,510,865,326,080  Delay: 1,601  Speed: 12,934,999,471 N/s
+N Base: 29,280,201,342,976  Delay: 1,601  Speed: 12,931,569,889 N/s
+N Base: 30,049,537,359,872  Delay: 1,601  Speed: 12,928,333,451 N/s
+N Base: 30,818,873,376,768  Delay: 1,601  Speed: 12,925,291,217 N/s
+N Base: 31,588,209,393,664  Delay: 1,601  Speed: 12,922,402,726 N/s
+N Base: 32,357,545,410,560  Delay: 1,601  Speed: 12,919,689,177 N/s
+N Base: 33,126,881,427,456  Delay: 1,601  Speed: 12,917,116,035 N/s
+N Base: 33,896,284,553,216  Delay: 1,601  Speed: 12,914,687,646 N/s
+N Base: 34,665,620,570,112  Delay: 1,601  Speed: 12,912,372,459 N/s
+N Base: 35,435,023,695,872  Delay: 1,601  Speed: 12,910,178,086 N/s
+N Base: 36,204,426,821,632  Delay: 1,601  Speed: 12,908,099,592 N/s
+N Base: 36,973,829,947,392  Delay: 1,601  Speed: 12,906,103,045 N/s
+N Base: 37,743,233,073,152  Delay: 1,601  Speed: 12,904,199,071 N/s
+N Base: 38,512,569,090,048  Delay: 1,601  Speed: 12,902,373,652 N/s
+N: 38,903,934,249,727   Delay: 1,617
+N Base: 39,281,905,106,944  Delay: 1,617  Speed: 12,900,613,416 N/s
+N Base: 40,051,241,123,840  Delay: 1,617  Speed: 12,898,924,997 N/s
+N Base: 40,820,577,140,736  Delay: 1,617  Speed: 12,897,308,825 N/s
+N Base: 41,589,913,157,632  Delay: 1,617  Speed: 12,895,771,011 N/s
+N Base: 42,359,249,174,528  Delay: 1,617  Speed: 12,894,283,496 N/s
+N Base: 43,128,518,082,560  Delay: 1,617  Speed: 12,892,848,147 N/s
+N Base: 43,897,854,099,456  Delay: 1,617  Speed: 12,891,482,163 N/s
+N Base: 44,667,190,116,352  Delay: 1,617  Speed: 12,890,158,958 N/s
+N Base: 45,436,459,024,384  Delay: 1,617  Speed: 12,888,879,408 N/s
+N Base: 46,205,795,041,280  Delay: 1,617  Speed: 12,887,651,952 N/s
+N Base: 46,975,131,058,176  Delay: 1,617  Speed: 12,886,469,346 N/s
