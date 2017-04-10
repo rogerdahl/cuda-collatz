@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(cuda_collatz)
+project(cuda-collatz)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -15,6 +15,7 @@ find_package(Boost 1.58.0 EXACT REQUIRED COMPONENTS program_options system)
 
 set(
   CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};
+  -gencode=arch=compute_61,code=sm_61
   -gencode arch=compute_50,code=sm_50
   -gencode arch=compute_35,code=sm_35
   -std=c++11;
